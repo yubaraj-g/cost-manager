@@ -1,6 +1,8 @@
 "use client";
 
-import { useState } from "react";
+import { useCallback, useEffect, useState } from "react";
+
+import { Plus } from "lucide-react";
 
 import { Typography } from "@/components/typography";
 import { Button } from "@/components/ui/button";
@@ -25,7 +27,9 @@ export default function HomeView() {
   const [expenses, setExpenses] = useState<ExpenseType[]>([{ ...newExpense }]);
   const [total, setTotal] = useState<number>(0);
 
-  const addExpense = () => {
+  const addExpense = (e: React.FormEvent) => {
+    e.preventDefault();
+
     setExpenses([
       ...expenses,
       {
@@ -48,21 +52,38 @@ export default function HomeView() {
     setExpenses(list);
   };
 
-  const calculateTotal = () => {
+  const calculateTotal = useCallback(() => {
     const value = expenses.reduce(
       (accumulated, current) => (accumulated += Number(current.amt)),
-      total
+      0
     );
     setTotal(value);
-  };
+  }, [expenses]);
+
+  useEffect(() => {
+    let timeout: NodeJS.Timeout;
+
+    timeout = setTimeout(() => calculateTotal(), 1000);
+
+    return () => {
+      clearTimeout(timeout);
+    };
+  }, [expenses, calculateTotal]);
 
   return (
     <div className="flex flex-col items-center justify-center gap-8 w-full">
-      <Typography.H1 className="text-primary">Welcome to Cost Planner</Typography.H1>
+      <Typography.H1 className="text-primary">
+        Welcome to Cost Planner
+      </Typography.H1>
 
-      <Typography.H2 className="text-primary/70">Start Calculating Your Costs.</Typography.H2>
+      <Typography.H2 className="text-primary/60">
+        Start Calculating Your Costs.
+      </Typography.H2>
 
-      <div className="w-full rounded-xl p-4 flex flex-col gap-2 max-w-[40rem] shadow-lg">
+      <form
+        onSubmit={addExpense}
+        className="w-full rounded-xl p-4 flex flex-col gap-2 max-w-[40rem] shadow-xl"
+      >
         <div className="flex gap-2">
           <Typography.Large className="w-2/3 text-center">
             Expense
@@ -72,18 +93,21 @@ export default function HomeView() {
           </Typography.Large>
         </div>
 
-        {expenses &&
-          expenses.map((ex, index) => (
-            <CostRow key={index} expense={ex} updateExpense={updateExpense} />
-          ))}
+        <div className="h-full flex flex-col gap-2">
+          {expenses &&
+            expenses.map((ex, index) => (
+              <CostRow key={index} expense={ex} updateExpense={updateExpense} />
+            ))}
+        </div>
 
-        <Button onClick={addExpense} className="mt-3">Add New Expense</Button>
-      </div>
-
-      <Button onClick={calculateTotal}>Calculate</Button>
+        <Button type="submit" className="mt-3 flex gap-1">
+          Add New Expense
+          <Plus size={18} />
+        </Button>
+      </form>
 
       <div className="flex gap-2 w-1/3 items-center">
-        <Typography.H3 className="w-2/3 text-end text-primary">
+        <Typography.H3 className="w-2/3 text-end">
           Your Total Expense:
         </Typography.H3>
         <Typography.H3 className="w-1/3 text-start text-primary">
