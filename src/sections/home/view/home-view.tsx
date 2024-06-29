@@ -2,10 +2,11 @@
 
 import { useCallback, useEffect, useState } from "react";
 
-import { Plus } from "lucide-react";
+import { Plus, ThumbsUp } from "lucide-react";
 
 import { Typography } from "@/components/typography";
 import { Button } from "@/components/ui/button";
+import { useToast } from "@/components/ui/use-toast";
 
 import CostRow from "../home-cost-row";
 
@@ -23,6 +24,8 @@ export default function HomeView() {
     exp: "",
     amt: 0,
   };
+
+  const { toast } = useToast();
 
   const [expenses, setExpenses] = useState<ExpenseType[]>([{ ...newExpense }]);
   const [total, setTotal] = useState<number>(0);
@@ -70,13 +73,42 @@ export default function HomeView() {
     };
   }, [expenses, calculateTotal]);
 
+  const emailFunction = async () => {
+    const name = "Anonymous";
+    const message = "Liked the app!";
+
+    toast({
+      description: "Thank you very much!",
+    });
+
+    try {
+      const res = await fetch("/api/send-email", {
+        method: "POST",
+        headers: new Headers({
+          "Content-Type": "application/json",
+        }),
+        body: JSON.stringify({ name, message }),
+      });
+
+      const json = await res.json();
+
+      console.log(json);
+
+      // toast({
+      //   description: "Thank you very much!",
+      // });
+    } catch (err) {
+      console.log(err);
+    }
+  };
+
   return (
-    <div className="flex flex-col items-center justify-center gap-8 w-full">
-      <Typography.H1 className="text-primary">
+    <div className="flex flex-col items-center justify-center gap-8 w-full mt-12 xl:mt-0">
+      <Typography.H1 className="text-primary text-center xl:text-start">
         Welcome to Cost Planner
       </Typography.H1>
 
-      <Typography.H2 className="text-primary/60">
+      <Typography.H2 className="text-primary/60 text-center xl:text-start">
         Start Calculating Your Costs.
       </Typography.H2>
 
@@ -106,13 +138,26 @@ export default function HomeView() {
         </Button>
       </form>
 
-      <div className="flex gap-2 w-1/3 items-center">
-        <Typography.H3 className="w-2/3 text-end">
+      <div className="flex gap-2 w-full xl:w-1/3 items-center justify-center">
+        <Typography.H3 className="w-fit text-end text-nowrap">
           Your Total Expense:
         </Typography.H3>
-        <Typography.H3 className="w-1/3 text-start text-primary">
+        <Typography.H3 className="w-fit text-start text-primary">
           {total}
         </Typography.H3>
+      </div>
+
+      <div className="fixed top-0 xl:top-14 right-0 xl:right-14 w-full xl:w-fit flex xl:flex-col items-center justify-center backdrop-blur-md p-3 xl:p-0">
+        <Typography.Muted>
+          If its helping you, please hit the like button. Thanks.
+        </Typography.Muted>
+        <Button
+          variant="ghost"
+          className="w-fit py-6 rounded-full"
+          onClick={emailFunction}
+        >
+          <ThumbsUp className="text-primary" />
+        </Button>
       </div>
     </div>
   );
