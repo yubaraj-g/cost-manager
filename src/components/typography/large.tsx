@@ -12,7 +12,7 @@ export default function Large({
   children: React.ReactNode;
 }) {
   return (
-    <div className={cn("text-lg font-semibold", className ?? "")}>
+    <div className={cn("text-base xl:text-lg font-semibold", className ?? "")}>
       {children}
     </div>
   );

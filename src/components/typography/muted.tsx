@@ -12,7 +12,7 @@ export default function Muted({
   children: React.ReactNode;
 }) {
   return (
-    <p className={cn("text-sm text-muted-foreground", className ?? "")}>
+    <p className={cn("text-xs xl:text-sm text-muted-foreground", className ?? "")}>
       {children}
     </p>
   );
