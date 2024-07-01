@@ -173,7 +173,7 @@ export default function HomeView() {
 
         <div className="flex gap-2">
           <Typography.Large className="w-2/3 text-start text-primary/70">
-            Expense
+            Expense Details
           </Typography.Large>
           <Typography.Large className="w-1/3 text-end text-primary/70">
             Amount
